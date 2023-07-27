@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "streamfinity-fastapi"
+version = "0.1.0"
+description = ""
+authors = ["jy <a7032181@gmail.com>"]
+readme = "README.md"
+packages = [{include = "streamfinity_fastapi"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.100.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
