@@ -1,7 +1,6 @@
 from datetime import date
-import select
 from fastapi import APIRouter, Depends, Query
-from sqlmodel import Session
+from sqlmodel import Session,select
 
 from streamfinity_fastapi.db import get_session
 from streamfinity_fastapi.schemas.movie_actor_schema import Actor, ActorInput
@@ -19,7 +18,7 @@ def get_actors(name:str | None = Query(None),
                sort: str = Query("id", description="The field to sort the results by"),
                order: str = Query("asc", description="The sort order: 'asc' or 'desc'"),
                session: Session=Depends(get_session))->list[Actor]:
-    query = select(Actor) # type: ignore
+    query = select(Actor)
     if name:
         query = query.where(Actor.last_name == name)
     if birthdate:
