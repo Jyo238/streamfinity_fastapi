@@ -1,4 +1,3 @@
-# from __future__ import annotations  # 添加这一行来启用前向引用
 from datetime import date
 from sqlmodel import Field, Relationship, SQLModel
 
