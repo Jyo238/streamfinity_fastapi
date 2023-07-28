@@ -6,6 +6,9 @@ from streamfinity_fastapi.db import get_session
 from streamfinity_fastapi.schemas.movie_actor_schema import Actor, ActorInput
 from fastapi import HTTPException
 
+from streamfinity_fastapi.schemas.user_schema import User
+from streamfinity_fastapi.security.hashing import get_current_user
+
 
 router = APIRouter(prefix="/api/actors")
 
@@ -42,12 +45,13 @@ def get_actor(actor_id: int,session: Session=Depends(get_session))->Actor:
     if(actor):
         return actor
     
-    raise HTTPException(status_code=404,detail="Actor with id={actor_id} not found")
+    raise HTTPException(status_code=404,detail=f"Actor with id={actor_id} not found")
 
-@router.post("/",response_model=Actor)
-def add_actor(actor_input:ActorInput,
+@router.post("/", response_model=Actor, status_code=201)
+def add_actor(actor_input: ActorInput,
+              current_user: User = Depends(get_current_user),
               session: Session = Depends(get_session)) -> Actor:
-    new_actor:Actor=Actor.from_orm(actor_input)
+    new_actor: Actor = Actor.from_orm(actor_input)
     session.add(new_actor)
     session.commit()
     session.refresh(new_actor)
