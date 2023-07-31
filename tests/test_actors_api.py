@@ -4,7 +4,9 @@ from streamfinity_fastapi.schemas.user_schema import UserInput
 from streamfinity_fastapi.streamfinity import app
 from fastapi import status
 from fastapi.testclient import TestClient
+
 client = TestClient(app)
+
 # Test data
 test_actor = ActorInput(
     first_name="Test",
@@ -22,12 +24,74 @@ access_token = (
     "7_92eJtzh3v0VNBoUJZknyoQI1zxSWIEy_AG12RGmuc"
 )
 
+test_user = UserInput(
+    email="pkalkie2@gmail.com",
+    password="test_password",
+    first_name="Test",
+    last_name="User",
+    is_active=True
+)
 
-def test_add_actor():
-    actor_data = test_actor.dict()
-    actor_data["date_of_birth"] = test_actor.date_of_birth.isoformat()
-    response = client.post("/api/actors/", json=actor_data,
+def create_user() -> dict:
+    response = client.post("/api/users/", json=test_user.dict())
+    return response.json()
+
+
+def get_test_actor_json():
+    json = {
+        **test_actor.dict(),
+        "date_of_birth": test_actor.date_of_birth.isoformat(),
+    }
+    return json
+
+
+def create_actor():
+    create_user()
+    json = get_test_actor_json()
+    response = client.post("/api/actors/", json=json,
+                           headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == status.HTTP_201_CREATED
+    return response.json()["id"]
+
+
+def test_create_actor():
+    create_user()
+    json = get_test_actor_json()
+    response = client.post("/api/actors/", json=json,
                            headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json()["first_name"] == test_actor.first_name
     assert response.json()["last_name"] == test_actor.last_name
+
+
+def test_get_actor():
+    actor_id = create_actor()
+    response = client.get(f"/api/actors/{actor_id}")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["first_name"] == test_actor.first_name
+    assert response.json()["last_name"] == test_actor.last_name
+
+
+def test_get_actors():
+    response = client.get("/api/actors/")
+    assert response.status_code == status.HTTP_200_OK
+    assert isinstance(response.json(), list)
+
+
+def test_update_actor():
+    actor_id = create_actor()
+    updated_actor = test_actor.copy(
+        update={"nationality": "British"}
+    ).dict()
+    updated_actor["date_of_birth"] = updated_actor["date_of_birth"].isoformat()
+    response = client.put(
+        f"/api/actors/{actor_id}", json=updated_actor
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["nationality"] == "British"
+
+
+def test_delete_actor():
+    actor_id = create_actor()
+    response = client.delete(f"/api/actors/{actor_id}")
+    assert response.status_code == status.HTTP_204_NO_CONTENT

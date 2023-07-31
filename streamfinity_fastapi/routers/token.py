@@ -12,7 +12,7 @@ from streamfinity_fastapi.schemas.token_schema import Token
 from streamfinity_fastapi.security.hashing import create_access_token, verify_password
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 3000000
-router = APIRouter(prefix="/api")
+router = APIRouter(prefix="/token")
 @router.post("/", response_model=Token)
 def login_login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_session)):
     query = select(User).where(User.email == form_data.username)
