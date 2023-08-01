@@ -1,8 +1,9 @@
 import os
 import pytest
 from sqlmodel import SQLModel
-from streamfinity_fastapi.db import engine
+
 os.environ["TESTING"] = "1"
+from streamfinity_fastapi.db import engine
 
 @pytest.fixture(scope="session",autouse = True)
 def creat_test_database():
