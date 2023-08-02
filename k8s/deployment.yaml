@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: streamfinity-api
-        image: streamfinity-api:v1.0.0-beta
+        image: a7032181/streamfinity-api:latest # 修改此處
         ports:
         - containerPort: 8000
